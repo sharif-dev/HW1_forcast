@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">practice1</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiYWxpcmV6YWRpemFqaSIsImEiOiJjazg2MzkycnMwMHZkM2ZwcmRwbmxvdWNzIn0.a0AxRizhLImFfFFDjQo8sQ</string>
+</resources>
