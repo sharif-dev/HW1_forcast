@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">practice1</string>
     <string name="mapbox_access_token">pk.eyJ1IjoiYWxpcmV6YWRpemFqaSIsImEiOiJjazg2MzkycnMwMHZkM2ZwcmRwbmxvdWNzIn0.a0AxRizhLImFfFFDjQo8sQ</string>
+    <string name="mapbox_url_first_part">https://api.mapbox.com/geocoding/v5/mapbox.places/</string>
+    <string name="mapbox_url_third_part">.json?access_token=</string>
+    <string name="progressbar_tag">progressbar</string>
+    <string name="connection_error">Connection Error</string>
+    <string name="network_error">Network Error</string>
+    <string name="no_result_found">No Result Found</string>
 </resources>
