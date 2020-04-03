@@ -2,6 +2,7 @@ package com.example.practice1.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +26,11 @@ import com.example.practice1.R;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -118,4 +124,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void writeToFile(String data, Context context) {
+        try {
+            OutputStreamWriter osr = new OutputStreamWriter(context.openFileOutput(getString(R.string.lastCheckedCityFilePath), Context.MODE_PRIVATE));
+            osr.write(data);
+            osr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String readFromFile(Context context) {
+        String res = "";
+        try {
+            InputStream inputStream = context.openFileInput(getString(R.string.lastCheckedCityFilePath));
+            if (inputStream != null) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString).append("\n");
+                }
+                inputStream.close();
+                res = stringBuilder.toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 }
