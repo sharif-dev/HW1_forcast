@@ -121,7 +121,7 @@ public class forecast extends AppCompatActivity {
         final ArrayList<String> arrays = new ArrayList<>();
         for(int i=0; i<7; i++){
             String s = dates.get(i) + "\nmintemp: "
-                    + minTemp.get(i) + "\nmaxtemp:" + maxTemp.get(i);
+                    + minTemp.get(i) + "\nmaxtemp: " + maxTemp.get(i);
             arrays.add(s);
         }
         handler.post(new Runnable() {
