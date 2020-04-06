@@ -3,6 +3,7 @@ package com.example.practice1.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -100,26 +101,28 @@ public class MainActivity extends AppCompatActivity {
     private void setResultAdapter(String response) {
         JSONParser parser = new JSONParser();
         ArrayList<String> cities = new ArrayList<>();
-        ArrayList<String> positions = new ArrayList<>();
+        final ArrayList positions = new ArrayList<>();
         try {
             JSONObject object = (JSONObject) parser.parse(response);
             ArrayList<JSONObject> features = (ArrayList)object.get("features");
             for(JSONObject feature: features) {
                 cities.add(feature.get("place_name").toString());
-                positions.add(feature.get("center").toString());
+                positions.add(feature.get("center"));
             }
             if (features.size() == 0)
                 setToast(getString(R.string.no_result_found));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        MyCitiesResultAdapter adapter = new MyCitiesResultAdapter(this, cities, positions);
+        MyCitiesResultAdapter adapter = new MyCitiesResultAdapter(this, cities);
         listView = findViewById(R.id.listView1);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO: clickItem
+                Intent intent = new Intent(getBaseContext(), forecast.class);
+                intent.putExtra(getString(R.string.intent1_key), positions.get(i).toString());
+                startActivity(intent);
             }
         });
     }

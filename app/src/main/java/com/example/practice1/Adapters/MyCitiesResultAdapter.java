@@ -15,13 +15,10 @@ import java.util.ArrayList;
 public class MyCitiesResultAdapter extends ArrayAdapter<String> {
     private Activity context;
     private ArrayList<String> cities;
-    private ArrayList<String> positions;
-
-    public MyCitiesResultAdapter(Activity context, ArrayList<String> cities, ArrayList<String> positions) {
+    public MyCitiesResultAdapter(Activity context, ArrayList<String> cities) {
         super(context, R.layout.city, cities);
         this.context = context;
         this.cities = cities;
-        this.positions = positions;
     }
 
     @Override

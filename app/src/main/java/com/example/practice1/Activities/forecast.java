@@ -40,20 +40,31 @@ public class forecast extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast2);
+        final String center = deserializeCenter(getIntent()
+                .getStringExtra(getString(R.string.intent1_key)));
         service.execute(new Runnable() {
             @Override
             public void run() {
-                ReadFromServer();
+                ReadFromServer(center);
             }
         });
 
     }
 
-    private void ReadFromServer(){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://api.weatherapi.com/v1/forecast.json?q=32,53&key=ef4f4e4d37aa4229b37121125200304&days=7";
+    private String deserializeCenter(String center) {
+        if (center == null)
+            return "";
+        return center.substring(1, center.length() - 1);
+    }
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+    private void ReadFromServer(String center){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringBuilder builder = new StringBuilder();
+        builder.append(getString(R.string.darksky_url_part1));
+        builder.append(getString(R.string.darksky_url_part2));
+        builder.append(center);
+        builder.append("&key=ef4f4e4d37aa4229b37121125200304&days=7");
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, builder.toString(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -67,7 +78,8 @@ public class forecast extends AppCompatActivity {
                     errorMessage = getString(R.string.connection_error);
                 else if (error instanceof NetworkError)
                     errorMessage = getString(R.string.network_error);
-                Toast toast = Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        errorMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
@@ -85,8 +97,10 @@ public class forecast extends AppCompatActivity {
             final JSONArray objects = forecastObj.getJSONArray("forecastday");
             for(int i =0; i<objects.length(); i++){
                 dates.add(objects.getJSONObject(i).getString("date"));
-                maxTemp.add(objects.getJSONObject(i).getJSONObject("day").getString("maxtemp_c"));
-                minTemp.add(objects.getJSONObject(i).getJSONObject("day").getString("mintemp_c"));
+                maxTemp.add(objects.getJSONObject(i)
+                        .getJSONObject("day").getString("maxtemp_c"));
+                minTemp.add(objects.getJSONObject(i)
+                        .getJSONObject("day").getString("mintemp_c"));
             }
 
         }catch (Exception e){
@@ -100,7 +114,8 @@ public class forecast extends AppCompatActivity {
         Handler handler = new Handler();
         final ArrayList<String> arrays = new ArrayList<>();
         for(int i=0; i<7; i++){
-            String s = dates.get(i) + "\nmintemp: " + minTemp.get(i) + "\nmaxtemp:" + maxTemp.get(i);
+            String s = dates.get(i) + "\nmintemp: "
+                    + minTemp.get(i) + "\nmaxtemp:" + maxTemp.get(i);
             arrays.add(s);
         }
         handler.post(new Runnable() {
@@ -112,7 +127,8 @@ public class forecast extends AppCompatActivity {
                 progressBar.setVisibility(View.INVISIBLE);
 
                 ListView listView = findViewById(R.id.forecast_list);
-                ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(), R.layout.activity_forecast_listview, arrays);
+                ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(),
+                        R.layout.activity_forecast_listview, arrays);
                 listView.setAdapter(adapter);
 
             }

@@ -11,4 +11,7 @@
     <string name="edit_text">Enter the massage</string>
     <string name="send">send</string>
     <string name="action_settings">Settings</string>
+    <string name="intent1_key">center</string>
+    <string name="darksky_url_part1">https://api.weatherapi.com/v1/</string>
+    <string name="darksky_url_part2">forecast.json?q=</string>
 </resources>
