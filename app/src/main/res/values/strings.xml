@@ -8,4 +8,7 @@
     <string name="network_error">Network Error</string>
     <string name="no_result_found">No Result Found</string>
     <string name="lastCheckedCityFilePath">lastCheckedCity.txt</string>
+    <string name="edit_text">Enter the massage</string>
+    <string name="send">send</string>
+    <string name="action_settings">Settings</string>
 </resources>
