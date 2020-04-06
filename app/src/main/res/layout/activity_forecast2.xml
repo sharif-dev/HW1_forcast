@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.forecast">
+    tools:context=".DisplayMessageActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -19,11 +19,12 @@
         app:layout_constraintVertical_bias="0.171" />
 
     <ListView
-        android:id="@+id/mobile_list"
-        android:layout_width="match_parent"
+        android:id="@+id/forecast_list"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints">
-    </ListView>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints"></ListView>
 
     <ProgressBar
         android:id="@+id/progressBar"

@@ -6,9 +6,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,13 +98,23 @@ public class forecast extends AppCompatActivity {
 
     private void changeUi(final ArrayList dates,final ArrayList minTemp,final ArrayList maxTemp){
         Handler handler = new Handler();
+        final ArrayList<String> arrays = new ArrayList<>();
+        for(int i=0; i<7; i++){
+            String s = dates.get(i) + "\nmintemp: " + minTemp.get(i) + "\nmaxtemp:" + maxTemp.get(i);
+            arrays.add(s);
+        }
         handler.post(new Runnable() {
             @Override
             public void run() {
+                TextView textView = findViewById(R.id.textView);
+                textView.setVisibility(View.INVISIBLE);
+                ProgressBar progressBar = findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.INVISIBLE);
 
-                ListView listView = findViewById(R.id.mobile_list);
-                ArrayAdapter adapter = new ArrayAdapter<String>(context, R.layout.activity_forecast2, dates);
+                ListView listView = findViewById(R.id.forecast_list);
+                ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(), R.layout.activity_forecast_listview, arrays);
                 listView.setAdapter(adapter);
+
             }
         });
 
