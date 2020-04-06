@@ -54,7 +54,13 @@ public class forecast extends AppCompatActivity {
     private String deserializeCenter(String center) {
         if (center == null)
             return "";
-        return center.substring(1, center.length() - 1);
+        String[] positions = center.substring(1, center.length() - 1)
+                .split(getString(R.string.comma));
+        StringBuilder builder = new StringBuilder();
+        builder.append(positions[1]);
+        builder.append(getString(R.string.comma));
+        builder.append(positions[0]);
+        return builder.toString();
     }
 
     private void ReadFromServer(String center){

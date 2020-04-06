@@ -14,4 +14,5 @@
     <string name="intent1_key">center</string>
     <string name="darksky_url_part1">https://api.weatherapi.com/v1/</string>
     <string name="darksky_url_part2">forecast.json?q=</string>
+    <string name="comma">,</string>
 </resources>
