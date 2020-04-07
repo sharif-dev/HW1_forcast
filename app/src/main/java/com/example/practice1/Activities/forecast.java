@@ -1,18 +1,20 @@
 package com.example.practice1.Activities;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -27,28 +29,40 @@ import com.example.practice1.R;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 public class forecast extends AppCompatActivity {
     private ExecutorService service = Executors.newFixedThreadPool(3);
     final Activity context = this;
+    private Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast2);
-        final String center = deserializeCenter(getIntent()
-                .getStringExtra(getString(R.string.intent1_key)));
+        handler = new Handler();
         service.execute(new Runnable() {
             @Override
             public void run() {
-                ReadFromServer(center);
+                ConnectivityManager cm = (ConnectivityManager)getApplicationContext()
+                        .getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+                    String center = deserializeCenter(getIntent().getStringExtra(getString(R.string.intent1_key)));
+                    ReadFromServer(center);
+                } else {
+                    System.out.println("NO INTERNET");
+                    getResult(readFromFile(context));
+                }
             }
         });
-
     }
 
     private String deserializeCenter(String center) {
@@ -73,21 +87,27 @@ public class forecast extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, builder.toString(),
                 new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(final String response) {
+                        service.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                writeToFile(response, context);
+                            }
+                        });
                         getResult(response);
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                String errorMessage = null;
-                if (error instanceof NoConnectionError)
-                    errorMessage = getString(R.string.connection_error);
-                else if (error instanceof NetworkError)
-                    errorMessage = getString(R.string.network_error);
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        errorMessage, Toast.LENGTH_SHORT);
-                toast.show();
-            }
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMessage = null;
+                        if (error instanceof NoConnectionError)
+                            errorMessage = getString(R.string.connection_error);
+                        else if (error instanceof NetworkError)
+                            errorMessage = getString(R.string.network_error);
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                errorMessage, Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
         });
 
         queue.add(stringRequest);
@@ -116,10 +136,9 @@ public class forecast extends AppCompatActivity {
         changeUi(dates, maxTemp, minTemp);
     }
 
-    private void changeUi(final ArrayList dates,final ArrayList minTemp,final ArrayList maxTemp){
-        Handler handler = new Handler();
+    private void changeUi(final ArrayList dates,final ArrayList minTemp,final ArrayList maxTemp) {
         final ArrayList<String> arrays = new ArrayList<>();
-        for(int i=0; i<7; i++){
+        for (int i = 0; i < 7; i++) {
             String s = dates.get(i) + "\nmintemp: "
                     + minTemp.get(i) + "\nmaxtemp:" + maxTemp.get(i);
             arrays.add(s);
@@ -136,9 +155,37 @@ public class forecast extends AppCompatActivity {
                 ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(),
                         R.layout.activity_forecast_listview, arrays);
                 listView.setAdapter(adapter);
-
             }
         });
+    }
 
+    private void writeToFile(String data, Context context) {
+        try {
+            OutputStreamWriter osr = new OutputStreamWriter(context.openFileOutput(getString(R.string.lastCheckedCityFilePath), Context.MODE_PRIVATE));
+            osr.write(data);
+            osr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String readFromFile(Context context) {
+        String res = "";
+        try {
+            InputStream inputStream = context.openFileInput(getString(R.string.lastCheckedCityFilePath));
+            if (inputStream != null) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String receiveString;
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString).append("\n");
+                }
+                inputStream.close();
+                res = stringBuilder.toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 }

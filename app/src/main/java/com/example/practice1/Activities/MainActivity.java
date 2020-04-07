@@ -1,9 +1,9 @@
 package com.example.practice1.Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -27,11 +29,6 @@ import com.example.practice1.R;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         searchButton = findViewById(R.id.SearchCityButton);
         editText = findViewById(R.id.SearchCityInput);
@@ -58,6 +56,16 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        ConnectivityManager cm = (ConnectivityManager)getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting()) {
+            System.out.println("NO INTERNET");
+            setToast(getString(R.string.network_error));
+            Intent intent = new Intent(getBaseContext(), forecast.class);
+            startActivity(intent);
+        }
     }
 
     private void clickButton() {
@@ -79,16 +87,16 @@ public class MainActivity extends AppCompatActivity {
                         setResultAdapter(response);
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                fragment.dismiss();
-                String errText = null;
-                if (error instanceof NoConnectionError)
-                    errText = getString(R.string.connection_error);
-                else if (error instanceof NetworkError)
-                    errText = getString(R.string.network_error);
-                setToast(errText);
-            }
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        fragment.dismiss();
+                        String errText = null;
+                        if (error instanceof NoConnectionError)
+                            errText = getString(R.string.connection_error);
+                        else if (error instanceof NetworkError)
+                            errText = getString(R.string.network_error);
+                        setToast(errText);
+                    }
         });
         queue.add(stringRequest);
     }
@@ -125,35 +133,5 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private void writeToFile(String data, Context context) {
-        try {
-            OutputStreamWriter osr = new OutputStreamWriter(context.openFileOutput(getString(R.string.lastCheckedCityFilePath), Context.MODE_PRIVATE));
-            osr.write(data);
-            osr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String readFromFile(Context context) {
-        String res = "";
-        try {
-            InputStream inputStream = context.openFileInput(getString(R.string.lastCheckedCityFilePath));
-            if (inputStream != null) {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((receiveString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(receiveString).append("\n");
-                }
-                inputStream.close();
-                res = stringBuilder.toString();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return res;
     }
 }
