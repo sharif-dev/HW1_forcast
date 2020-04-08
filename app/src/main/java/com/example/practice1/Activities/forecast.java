@@ -6,18 +6,22 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -41,15 +45,16 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 public class forecast extends AppCompatActivity {
     private ExecutorService service = Executors.newFixedThreadPool(3);
     final Activity context = this;
+    private Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast2);
+        handler = new Handler();
         service.execute(new Runnable() {
             @Override
             public void run() {
@@ -57,8 +62,7 @@ public class forecast extends AppCompatActivity {
                         .getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-                    String center = deserializeCenter(getIntent()
-                            .getStringExtra(getString(R.string.intent1_key)));
+                    String center = deserializeCenter(getIntent().getStringExtra(getString(R.string.intent1_key)));
                     ReadFromServer(center);
                 } else {
                     System.out.println("NO INTERNET");
@@ -66,7 +70,6 @@ public class forecast extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private String deserializeCenter(String center) {
@@ -141,7 +144,6 @@ public class forecast extends AppCompatActivity {
     }
 
     private void changeUi(final ArrayList dates,final ArrayList minTemp,final ArrayList maxTemp) {
-        Handler handler = new Handler();
         final ArrayList<String> arrays = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             String s = dates.get(i) + "\nmintemp: "
