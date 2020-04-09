@@ -29,10 +29,11 @@ public class ForecastListAdapter extends ArrayAdapter<String> {
         TextView date = (TextView) rowView.findViewById(R.id.date);
         TextView mintemptext = (TextView) rowView.findViewById(R.id.mintemp_text);
         TextView maxtemptext = (TextView) rowView.findViewById(R.id.maxtemp_text);
-        ImageView image = (ImageView) rowView.findViewById(R.id.icon);
+        final ImageView image = (ImageView) rowView.findViewById(R.id.icon);
 
         String[] strings = values[position].split("\\s+");
-        Picasso.get().load(strings[0]).into(image);
+        Picasso.get().load("https:" + strings[0]).into(image);
+        Picasso.get().setLoggingEnabled(true);
         date.setText(strings[1]);
         mintemptext.setText(strings[2]);
         maxtemptext.setText(strings[3]);
