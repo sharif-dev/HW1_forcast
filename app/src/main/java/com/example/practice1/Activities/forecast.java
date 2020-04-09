@@ -2,17 +2,10 @@ package com.example.practice1.Activities;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -31,8 +24,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.practice1.Adapters.ForecastListAdapter;
 import com.example.practice1.R;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -125,8 +118,8 @@ public class forecast extends AppCompatActivity {
         final ArrayList<String> dates = new ArrayList<>();
         final ArrayList<String> maxTemp = new ArrayList<>();
         final ArrayList<String> minTemp = new ArrayList<>();
-        String location = new String();
-        String temp = new String();
+        final ArrayList<String> iconUrl = new ArrayList<>();
+        String location = "", temp = "", lastUpdatedTime = "";
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONObject forecastObj = jsonObject.getJSONObject("forecast");
@@ -137,28 +130,28 @@ public class forecast extends AppCompatActivity {
                         .getJSONObject("day").getString("maxtemp_c"));
                 minTemp.add(objects.getJSONObject(i)
                         .getJSONObject("day").getString("mintemp_c"));
+                iconUrl.add(objects.getJSONObject(i).getJSONObject("day")
+                        .getJSONObject("condition").getString("icon"));
             }
             JSONObject currentLocation = jsonObject.getJSONObject("location");
             location = currentLocation.getString("name") + ", " +
                     currentLocation.getString("region")+ ", " +
                         currentLocation.getString("country");
             temp = jsonObject.getJSONObject("current").getString("temp_c");
-
-
-
+            lastUpdatedTime = jsonObject.getJSONObject("current").getString("last_updated").split("\\s+")[1];
         }catch (Exception e){
             Log.i("error", e.toString());
         }
 
-        changeUi(dates, maxTemp, minTemp, location, temp);
+        changeUi(dates, minTemp, maxTemp, iconUrl, location, temp, lastUpdatedTime);
     }
 
-    private void changeUi(final ArrayList dates, final ArrayList minTemp, final ArrayList maxTemp, final String location,final String temp) {
-        final ArrayList<String> arrays = new ArrayList<>();
+    private void changeUi(final ArrayList<String> dates, final ArrayList minTemp, final ArrayList maxTemp, final ArrayList iconUrl,
+                          final String location, final String temp, final String lastUpdatedTime) {
+        final String[] values = new String[7];
         for (int i = 0; i < 7; i++) {
-            String s = dates.get(i) + "\nmintemp: "
-                    + minTemp.get(i) + "\u2103" + "\nmaxtemp: " + maxTemp.get(i) + "\u2103";
-            arrays.add(s);
+            values[i] = iconUrl.get(i) + " " + dates.get(i).substring(5)
+                    + " " + minTemp.get(i) + "\u2103 " + maxTemp.get(i) + "\u2103 ";
         }
         handler.post(new Runnable() {
             @Override
@@ -172,12 +165,12 @@ public class forecast extends AppCompatActivity {
                 locationTextView.setText(location);
 
                 TextView tempTextView = findViewById(R.id.location_temp);
-                tempTextView.setText("temperature: " + temp + "\u2103");
+                tempTextView.setText("last updated " + lastUpdatedTime + "\t\t\t\t" + temp + "\u2103");
 
                 ListView listView = findViewById(R.id.forecast_list);
-                ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(),
-                        R.layout.activity_forecast_listview, arrays);
+                ForecastListAdapter adapter = new ForecastListAdapter(context, values);
                 listView.setAdapter(adapter);
+
             }
         });
     }

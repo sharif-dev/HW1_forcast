@@ -11,7 +11,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading..."
+        android:text="@string/loading"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -21,14 +21,16 @@
 
     <ListView
         android:id="@+id/forecast_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.662"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp"></ListView>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/location_temp"
+        app:layout_constraintVertical_bias="0.835"
+        tools:ignore="MissingConstraints" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -43,11 +45,15 @@
 
     <TextView
         android:id="@+id/location_textview"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:textSize="26dip"
+        android:textSize="26sp"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMaxTextSize="50sp"
+        app:autoSizeStepGranularity="2sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,8 +64,8 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="5dp"
-        android:textSize="20dip"
-        app:layout_constraintBottom_toTopOf="@+id/forecast_list"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/forecast_list"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/location_textview"
         app:layout_constraintVertical_bias="0.011" />
