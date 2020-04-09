@@ -32,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.practice1.R;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -124,6 +125,8 @@ public class forecast extends AppCompatActivity {
         final ArrayList<String> dates = new ArrayList<>();
         final ArrayList<String> maxTemp = new ArrayList<>();
         final ArrayList<String> minTemp = new ArrayList<>();
+        String location = new String();
+        String temp = new String();
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONObject forecastObj = jsonObject.getJSONObject("forecast");
@@ -135,19 +138,26 @@ public class forecast extends AppCompatActivity {
                 minTemp.add(objects.getJSONObject(i)
                         .getJSONObject("day").getString("mintemp_c"));
             }
+            JSONObject currentLocation = jsonObject.getJSONObject("location");
+            location = currentLocation.getString("name") + ", " +
+                    currentLocation.getString("region")+ ", " +
+                        currentLocation.getString("country");
+            temp = jsonObject.getJSONObject("current").getString("temp_c");
+
+
 
         }catch (Exception e){
             Log.i("error", e.toString());
         }
 
-        changeUi(dates, maxTemp, minTemp);
+        changeUi(dates, maxTemp, minTemp, location, temp);
     }
 
-    private void changeUi(final ArrayList dates,final ArrayList minTemp,final ArrayList maxTemp) {
+    private void changeUi(final ArrayList dates, final ArrayList minTemp, final ArrayList maxTemp, final String location,final String temp) {
         final ArrayList<String> arrays = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             String s = dates.get(i) + "\nmintemp: "
-                    + minTemp.get(i) + "\nmaxtemp: " + maxTemp.get(i);
+                    + minTemp.get(i) + "\u2103" + "\nmaxtemp: " + maxTemp.get(i) + "\u2103";
             arrays.add(s);
         }
         handler.post(new Runnable() {
@@ -157,6 +167,12 @@ public class forecast extends AppCompatActivity {
                 textView.setVisibility(View.INVISIBLE);
                 ProgressBar progressBar = findViewById(R.id.progressBar);
                 progressBar.setVisibility(View.INVISIBLE);
+
+                TextView locationTextView = findViewById(R.id.location_textview);
+                locationTextView.setText(location);
+
+                TextView tempTextView = findViewById(R.id.location_temp);
+                tempTextView.setText("temperature: " + temp + "\u2103");
 
                 ListView listView = findViewById(R.id.forecast_list);
                 ArrayAdapter adapter = new ArrayAdapter<String>(listView.getContext(),
