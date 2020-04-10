@@ -119,12 +119,13 @@ public class forecast extends AppCompatActivity {
         final ArrayList<String> maxTemp = new ArrayList<>();
         final ArrayList<String> minTemp = new ArrayList<>();
         final ArrayList<String> iconUrl = new ArrayList<>();
+        final String[] values = new String[7];
         String location = "", temp = "", lastUpdatedTime = "";
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONObject forecastObj = jsonObject.getJSONObject("forecast");
             final JSONArray objects = forecastObj.getJSONArray("forecastday");
-            for(int i =0; i<objects.length(); i++){
+            for(int i =0; i < objects.length(); i++){
                 dates.add(objects.getJSONObject(i).getString("date"));
                 maxTemp.add(objects.getJSONObject(i)
                         .getJSONObject("day").getString("maxtemp_c"));
@@ -139,20 +140,18 @@ public class forecast extends AppCompatActivity {
                         currentLocation.getString("country");
             temp = jsonObject.getJSONObject("current").getString("temp_c");
             lastUpdatedTime = jsonObject.getJSONObject("current").getString("last_updated").split("\\s+")[1];
+            for (int i = 0; i < 7; ++i) {
+                values[i] = iconUrl.get(i) + " " + dates.get(i) + " " +
+                        minTemp.get(i) + "\u2103 " + maxTemp.get(i) + "\u2103";
+            }
         }catch (Exception e){
             Log.i("error", e.toString());
         }
 
-        changeUi(dates, minTemp, maxTemp, iconUrl, location, temp, lastUpdatedTime);
+        changeUi(values, location, temp, lastUpdatedTime);
     }
 
-    private void changeUi(final ArrayList<String> dates, final ArrayList minTemp, final ArrayList maxTemp, final ArrayList iconUrl,
-                          final String location, final String temp, final String lastUpdatedTime) {
-        final String[] values = new String[7];
-        for (int i = 0; i < 7; i++) {
-            values[i] = iconUrl.get(i) + " " + dates.get(i).substring(5)
-                    + " " + minTemp.get(i) + "\u2103 " + maxTemp.get(i) + "\u2103 ";
-        }
+    private void changeUi(final String[] values, final String location, final String temp, final String lastUpdatedTime) {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -170,7 +169,6 @@ public class forecast extends AppCompatActivity {
                 ListView listView = findViewById(R.id.forecast_list);
                 ForecastListAdapter adapter = new ForecastListAdapter(context, values);
                 listView.setAdapter(adapter);
-
             }
         });
     }
