@@ -38,11 +38,6 @@ public class ForecastListAdapter extends ArrayAdapter<String> {
         final ImageView image = (ImageView) rowView.findViewById(R.id.icon);
 
         String[] strings = values[position].split("\\s+");
-        Picasso.get().load("https:" + strings[0]).into(image);
-        Picasso.get().setLoggingEnabled(true);
-        mintemptext.setText(strings[2]);
-        maxtemptext.setText(strings[3]);
-
         try {
             cal.setTime(new SimpleDateFormat("yyyy-mm-dd").parse(strings[1]));
             int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
@@ -50,6 +45,9 @@ public class ForecastListAdapter extends ArrayAdapter<String> {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        Picasso.get().load("https:" + strings[0]).into(image);
+        mintemptext.setText(strings[2]);
+        maxtemptext.setText(strings[3]);
         return rowView;
     }
 }
