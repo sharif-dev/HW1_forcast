@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -56,10 +57,8 @@ public class forecast extends AppCompatActivity {
                         .getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
-                    String center = deserializeCenter(getIntent().getStringExtra(getString(R.string.intent1_key)));
-                    ReadFromServer(center);
+                    ReadFromServer(deserializeCenter(getIntent().getStringExtra(getString(R.string.intent1_key))));
                 } else {
-                    System.out.println("NO INTERNET");
                     getResult(readFromFile(context));
                 }
             }
@@ -119,12 +118,13 @@ public class forecast extends AppCompatActivity {
         final ArrayList<String> maxTemp = new ArrayList<>();
         final ArrayList<String> minTemp = new ArrayList<>();
         final ArrayList<String> iconUrl = new ArrayList<>();
+        final String[] values = new String[7];
         String location = "", temp = "", lastUpdatedTime = "";
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONObject forecastObj = jsonObject.getJSONObject("forecast");
             final JSONArray objects = forecastObj.getJSONArray("forecastday");
-            for(int i =0; i<objects.length(); i++){
+            for(int i =0; i < objects.length(); i++){
                 dates.add(objects.getJSONObject(i).getString("date"));
                 maxTemp.add(objects.getJSONObject(i)
                         .getJSONObject("day").getString("maxtemp_c"));
@@ -139,20 +139,18 @@ public class forecast extends AppCompatActivity {
                         currentLocation.getString("country");
             temp = jsonObject.getJSONObject("current").getString("temp_c");
             lastUpdatedTime = jsonObject.getJSONObject("current").getString("last_updated").split("\\s+")[1];
+            for (int i = 0; i < 7; ++i) {
+                values[i] = iconUrl.get(i) + " " + dates.get(i) + " " +
+                        minTemp.get(i) + "\u2103 " + maxTemp.get(i) + "\u2103";
+            }
         }catch (Exception e){
             Log.i("error", e.toString());
         }
 
-        changeUi(dates, minTemp, maxTemp, iconUrl, location, temp, lastUpdatedTime);
+        changeUi(values, location, temp, lastUpdatedTime);
     }
 
-    private void changeUi(final ArrayList<String> dates, final ArrayList minTemp, final ArrayList maxTemp, final ArrayList iconUrl,
-                          final String location, final String temp, final String lastUpdatedTime) {
-        final String[] values = new String[7];
-        for (int i = 0; i < 7; i++) {
-            values[i] = iconUrl.get(i) + " " + dates.get(i).substring(5)
-                    + " " + minTemp.get(i) + "\u2103 " + maxTemp.get(i) + "\u2103 ";
-        }
+    private void changeUi(final String[] values, final String location, final String temp, final String lastUpdatedTime) {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -164,15 +162,52 @@ public class forecast extends AppCompatActivity {
                 TextView locationTextView = findViewById(R.id.location_textview);
                 locationTextView.setText(location);
 
-                TextView tempTextView = findViewById(R.id.location_temp);
+                TextView tempTextView = findViewById(R.id.temp_textview);
                 tempTextView.setText("last updated " + lastUpdatedTime + "\t\t\t\t" + temp + "\u2103");
+
+                ImageButton refreshBtn = findViewById(R.id.refresh_button);
+                refreshBtn.setVisibility(View.VISIBLE);
+                refreshBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                        startActivity(getIntent());
+                    }
+                });
 
                 ListView listView = findViewById(R.id.forecast_list);
                 ForecastListAdapter adapter = new ForecastListAdapter(context, values);
                 listView.setAdapter(adapter);
-
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        for (int i = 0; i < parent.getChildCount(); i++) {
+                            TextView mintemp_textview = parent.getChildAt(i).findViewById(R.id.mintemp_text);
+                            TextView maxtemp_textview = parent.getChildAt(i).findViewById(R.id.maxtemp_text);
+                            mintemp_textview.setText(convertTemp((String) mintemp_textview.getText()));
+                            maxtemp_textview.setText(convertTemp((String) maxtemp_textview.getText()));
+                        }
+                    }
+                });
             }
         });
+    }
+
+    private String convertTemp(String text) {
+        double temp = Double.parseDouble(text.substring(0, text.length() - 1));
+        if (text.charAt(text.length() - 1) == '\u2103') {
+            // temp is in celsius, converting to fahrenheit
+            temp = temp * 1.8 + 32;
+            temp = Math.round(temp * 10.0) / 10.0;
+            return temp + "\u2109";
+        }
+        if (text.charAt(text.length() - 1) == '\u2109') {
+            // temp is in fahrenheit, converting to celsius
+            temp = (temp - 32) / 1.8;
+            temp = Math.round(temp * 10.0) / 10.0;
+            return temp + "\u2103";
+        }
+        return text;
     }
 
     private void writeToFile(String data, Context context) {

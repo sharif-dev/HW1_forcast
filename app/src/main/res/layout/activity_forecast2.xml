@@ -16,19 +16,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
         app:layout_constraintVertical_bias="0.09" />
 
     <ListView
         android:id="@+id/forecast_list"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location_temp"
+        app:layout_constraintTop_toBottomOf="@id/temp_textview"
         app:layout_constraintVertical_bias="0.835"
         tools:ignore="MissingConstraints" />
 
@@ -58,16 +58,28 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/location_temp"
+        android:id="@+id/temp_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="5dp"
+        android:layout_margin="6dp"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/forecast_list"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location_textview"
+        app:layout_constraintTop_toBottomOf="@id/location_textview"
         app:layout_constraintVertical_bias="0.011" />
+
+    <ImageButton
+        android:id="@+id/refresh_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/refresh_icon"
+        android:background="@drawable/round_corner"
+        android:visibility="invisible"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/location_textview"
+        app:layout_constraintCircleRadius="30dp"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
