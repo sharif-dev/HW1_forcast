@@ -16,5 +16,4 @@
     <string name="darksky_url_part2">forecast.json?q=</string>
     <string name="comma">,</string>
     <string name="loading">Loading...</string>
-    <string name="results_main_activity">Results:</string>
 </resources>
